@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>halfgreen</title>
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+        }
+        .wall {
+            width: 100vw;
+            height: 100vh;
+            background: linear-gradient(to bottom, #ffffff 50%, #90ee90 50%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+        .text {
+            position: absolute;
+            font-family: 'Times New Roman', serif;
+            font-size: 24px;
+            color: red;
+            opacity: 0;
+            transition: opacity 1s ease-in-out;
+        }
+        .color-picker {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+        }
+        .image-container {
+            position: fixed;
+            opacity: 0;
+            transition: opacity 3s ease-out;
+        }
+        .image-container img {
+            width: 150px;
+            height: 150px;
+            border-radius: 10px;
+            position: absolute;
+            cursor: grab;
+            opacity: 0;
+            transition: opacity 3s ease-out;
+        }
+        audio {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="wall" id="wall">
+        <div class="text" id="text1">half white half green</div>
+        <div class="text" id="text2">they don't paint walls like this anymore</div>
+    </div>
+    
+    <input type="color" class="color-picker" id="color1" value="#ffffff">
+    <input type="color" class="color-picker" id="color2" value="#90ee90" style="left: 60px;">
+    
+    <div class="image-container" id="imageContainer"></div>
+    <audio controls>
+        <source src="your-music.mp3" type="audio/mp3">
+        您的浏览器不支持音频播放。
+    </audio>
+    
+    <script>
+        const wall = document.getElementById('wall');
+        const text1 = document.getElementById('text1');
+        const text2 = document.getElementById('text2');
+        
+        // 显示第一句文字
+        setTimeout(() => {
+            text1.style.opacity = 1;
+        }, 500);  // 0.5秒后显示第一句文字
+        
+        // 5秒后显示第二句文字
+        setTimeout(() => {
+            text2.style.opacity = 1;
+            text2.style.position = 'absolute';
+            text2.style.left = `${Math.random() * (window.innerWidth - 200)}px`;  // 随机位置
+            text2.style.top = `${Math.random() * (window.innerHeight - 50)}px`;  // 随机位置
+            text2.style.cursor = 'pointer';  // 让第二句文字变成可点击
+            text2.addEventListener('click', () => {
+                window.location.href = 'second-page-2.html';  // 点击后跳转到新的页面
+            });
+        }, 5000);  // 5秒后显示第二句文字
+
+        // 加载图片并设置淡出效果
+        function loadImages() {
+            const imageContainer = document.getElementById('imageContainer');
+            let imagePaths = [
+                'https://i.imgur.com/0f7Pzjj.png',  // 替换为实际的图片 URL
+                'https://i.imgur.com/c8Xq7GT.png'   // 替换为实际的图片 URL
+            ];
+            
+            // 在右侧显示2张图片
+            imagePaths.forEach((src, index) => {
+                let img = document.createElement('img');
+                img.src = src;
+                img.style.left = `${Math.random() * (window.innerWidth / 2) + window.innerWidth / 2}px`;
+                img.style.top = `${Math.random() * window.innerHeight}px`;
+                img.onload = () => {
+                    setTimeout(() => {
+                        img.style.opacity = 1;
+                    }, 500);  // 图片加载后淡入
+                    setTimeout(() => {
+                        img.style.opacity = 0;  // 逐渐淡出
+                    }, 5000);  // 5秒后开始淡出
+                };
+                imageContainer.appendChild(img);
+            });
+        }
+
+        // 显示第二组图片（左侧）
+        setTimeout(() => {
+            loadImages();  // 10秒后加载图片
+        }, 10000);
+        
+        // 根据鼠标移动更新背景和文本透明度
+        document.addEventListener('mousemove', (event) => {
+            let xPercent = event.clientX / window.innerWidth;
+            let yPercent = event.clientY / window.innerHeight;
+            let fade = Math.min((xPercent + yPercent) / 1.5, 1);
+            let gradientStrength = fade * 50;
+            
+            wall.style.background = `linear-gradient(to bottom, #ffffff ${50 - gradientStrength}%, #90ee90 ${50 + gradientStrength}%)`;
+            text1.style.opacity = fade;
+        });
+    </script>
+</body>
+</html>

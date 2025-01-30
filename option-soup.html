@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>halfgreen</title>
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+            font-family: 'Times New Roman', serif;
+        }
+        .wall {
+            width: 100vw;
+            height: 100vh;
+            background: linear-gradient(to bottom, #ffffff 50%, #90ee90 50%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+        .draggable {
+            position: absolute;
+            font-size: 24px;
+            font-weight: normal;
+            color: red;
+            cursor: grab;
+            user-select: none;
+        }
+        .clickable {
+            position: absolute;
+            font-size: 24px;
+            font-weight: normal;
+            color: blue;
+            cursor: pointer;
+        }
+        .hidden-text {
+            font-size: 16px;
+            color: rgba(179, 179, 179, 0.688);
+            display: none; /* 默认隐藏 */
+            margin-top: 5px;
+        }
+
+        .ee-text {
+            position: absolute;
+            font-size: 24px;
+            color: red;
+            cursor: pointer;
+            font-weight: normal;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 999;
+        }
+    </style>
+</head>
+<body>
+    <div class="wall" id="wall"></div>
+
+    <!-- 可拖动的 A、B、C 选项 -->
+    <div class="draggable" id="optionA" style="left: 50px; top: 50px;">To drink</div>
+    <div class="draggable" id="optionB" style="left: 50px; top: 100px;">To forget about</div>
+    <div class="draggable" id="optionC" style="left: 50px; top: 150px;">To recall</div>
+
+
+    <script>
+        // 允许拖动的函数
+        function makeDraggable(element) {
+            let offsetX = 0, offsetY = 0, isDragging = false;
+
+            element.addEventListener('mousedown', (e) => {
+                isDragging = true;
+                offsetX = e.clientX - element.getBoundingClientRect().left;
+                offsetY = e.clientY - element.getBoundingClientRect().top;
+                element.style.cursor = "grabbing";
+            });
+
+            document.addEventListener('mousemove', (e) => {
+                if (!isDragging) return;
+                element.style.left = `${e.clientX - offsetX}px`;
+                element.style.top = `${e.clientY - offsetY}px`;
+            });
+
+            document.addEventListener('mouseup', () => {
+                isDragging = false;
+                element.style.cursor = "grab";
+            });
+        }
+
+        // 让 A、B、C 选项可以拖动
+        makeDraggable(document.getElementById("optionA"));
+        makeDraggable(document.getElementById("optionB"));
+        makeDraggable(document.getElementById("optionC"));
+
+        // 5秒后在随机位置显示 E、F、G 并能点击展开文字
+        setTimeout(() => {
+            const texts = [
+                { letter: 'a borscht soup', content: 'in Shanghai? in Kyiv? in Riga?' },
+                { letter: 'a piece of time', content: 'in 1954? 1989? in 2020? in 2022?' },
+                { letter: 'a basket of chrysanthemum', content: 'on the first day of the new year on the street of Wuhan' }
+            ];
+
+            texts.forEach(item => {
+                let textElement = document.createElement('div');
+                textElement.classList.add('clickable');
+                textElement.textContent = item.letter;
+                textElement.style.left = `${Math.random() * (window.innerWidth - 50)}px`;
+                textElement.style.top = `${Math.random() * (window.innerHeight - 30)}px`;
+
+                // 创建隐藏的文本
+                let hiddenText = document.createElement('div');
+                hiddenText.classList.add('hidden-text');
+                hiddenText.textContent = item.content;
+
+                // 点击展开/隐藏文字
+                textElement.addEventListener('click', () => {
+                    hiddenText.style.display = hiddenText.style.display === 'none' ? 'block' : 'none';
+                });
+
+                document.body.appendChild(textElement);
+                textElement.appendChild(hiddenText); // 让隐藏文字出现在 E、F、G 下方
+            });
+        }, 3000); // 3秒后执行
+
+       // 25秒后，显示 "EE" 并且点击跳转页面
+       setTimeout(() => {
+            let eeElement = document.createElement('div');
+            eeElement.classList.add('ee-text');
+            eeElement.textContent = 'Or to erase';
+            eeElement.style.left = `${Math.random() * (window.innerWidth - 50)}px`;
+            eeElement.style.top = `${Math.random() * (window.innerHeight - 30)}px`;
+
+            // 点击后跳转
+            eeElement.addEventListener('click', () => {
+                window.location.href = 'soup-next.html'; // 这里填写跳转的页面
+            });
+
+            document.body.appendChild(eeElement);
+        }, 20000);
+
+
+    </script>
+</body>
+</html>

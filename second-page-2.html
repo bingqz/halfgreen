@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>时间之墙</title>
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+            font-family: 'Times New Roman', serif;
+        }
+        .wall {
+            width: 100vw;
+            height: 100vh;
+            background: linear-gradient(to bottom, #ffffff 50%, #90ee90 50%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 1s ease-in-out;
+            position: relative;
+        }
+        .text {
+            position: absolute;
+            font-family: 'Times New Roman', serif;
+            font-size: 24px;
+            color: red;
+            opacity: 0;
+            transition: opacity 1s ease-in-out;
+        }
+        .color-picker {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+        }
+        .image-container {
+            position: fixed;
+            bottom: 20px;
+            opacity: 1;
+            transition: opacity 3s ease-out;
+        }
+        .image-container img {
+            width: 320px;
+            height: 240px;
+            border-radius: 0px;
+            position: absolute;
+            cursor: grab;
+        }
+        audio {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+        }
+        .random-text {
+            position: absolute;
+            font-family: 'Times New Roman', serif;
+            font-size: 24px;
+            color: gray;
+            cursor: pointer;
+            opacity: 0.5;
+            transition: opacity 0.5s ease-in-out;
+        }
+        .highlighted {
+            color: red;
+        }
+    </style>
+</head>
+<body>
+    <div class="wall" id="wall">
+        <div class="text" id="text"></div>
+    </div>
+    <input type="color" class="color-picker" id="color1" value="#ffffff">
+    <input type="color" class="color-picker" id="color2" value="#90ee90" style="left: 32px;">
+    
+    <div class="image-container" id="imageContainer"></div>
+    <audio controls>
+        <source src="your-music.mp3" type="audio/mp3">
+        您的浏览器不支持音频播放。
+    </audio>
+    
+    <script>
+        const wall = document.getElementById('wall');
+        const text = document.getElementById('text');
+        const imageContainer = document.getElementById('imageContainer');
+        
+        // 加载图片并放置到右侧
+        function loadImagesRight() {
+            let imagePaths = [
+                'https://i.imgur.com/0f7Pzjj.png',  // 替换为实际的图片 URL
+                'https://i.imgur.com/c8Xq7GT.png'   // 替换为实际的图片 URL
+            ];
+            imagePaths.forEach((src, index) => {
+                let img = document.createElement('img');
+                img.src = src;
+                img.style.right = Math.random() * window.innerWidth + 'px'; // 随机位置
+                img.style.bottom = (index * 180 + 20) + 'px';  // 设置不同的底部位置
+                imageContainer.appendChild(img);
+                
+                // 给图片加上渐变淡出的效果
+                setTimeout(() => {
+                    img.style.transition = 'opacity 3s ease-out';
+                    img.style.opacity = 0; // 开始淡出
+                }, 5000);  // 5秒后开始淡出
+            });
+        }
+
+        // 加载图片并放置到左侧
+        function loadImagesLeft() {
+            let imagePaths = [
+                'https://i.imgur.com/0f7Pzjj.png',  // 替换为实际的图片 URL
+                'https://i.imgur.com/c8Xq7GT.png'   // 替换为实际的图片 URL
+            ];
+            imagePaths.forEach((src, index) => {
+                let img = document.createElement('img');
+                img.src = src;
+                img.style.left = Math.random() * window.innerWidth + 'px';  // 随机位置
+                img.style.bottom = (index * 180 + 20) + 'px';  // 设置不同的底部位置
+                imageContainer.appendChild(img);
+                
+                // 给图片加上渐变淡出的效果
+                setTimeout(() => {
+                    img.style.transition = 'opacity 3s ease-out';
+                    img.style.opacity = 0; // 开始淡出
+                }, 5000);  // 5秒后开始淡出
+            });
+        }
+
+        // 根据鼠标移动更新背景和文本透明度
+        document.addEventListener('mousemove', (event) => {
+            let xPercent = event.clientX / window.innerWidth;
+            let yPercent = event.clientY / window.innerHeight;
+            let fade = Math.min((xPercent + yPercent) / 1.5, 1);
+            let gradientStrength = fade * 50;
+            
+            wall.style.background = `linear-gradient(to bottom, #ffffff ${50 - gradientStrength}%, #90ee90 ${50 + gradientStrength}%)`;
+            text.style.opacity = fade;
+        });
+        
+        // 初始化时加载右侧图片并淡出
+        loadImagesRight();
+        
+        // 10秒后加载左侧的图片并淡出
+        setTimeout(() => {
+            loadImagesLeft();
+        }, 10000);  // 延迟10秒
+
+        // 第一部分：随机位置的文字
+        function createRandomText() {
+            const words = ['We trespassed the traffic light', 'without buttons'];
+            for (let i = 0; i < 15; i++) {
+                const word = document.createElement('div');
+                word.classList.add('random-text');
+                word.textContent = words[i < 10 ? 0 : 1];  // 前10条是 "half"，接着5条是 "anym"
+                word.style.left = `${Math.random() * window.innerWidth}px`;
+                word.style.top = `${Math.random() * window.innerHeight}px`;
+                document.body.appendChild(word);
+
+                word.addEventListener('mouseover', () => {
+                    word.classList.add('highlighted');
+                });
+
+                word.addEventListener('mouseout', () => {
+                    word.classList.remove('highlighted');
+                });
+
+                word.addEventListener('click', () => {
+                    window.location.href = 'option-soup.html';  // 点击跳转
+                });
+            }
+        }
+
+        // 第二部分：隐藏的随机位置文字
+        function createHiddenText() {
+            const words = ['Step by step, treading from one bunker entrance to the exit', 'Sea buckthorn protrudes'];
+            for (let i = 0; i < 10; i++) {
+                const word = document.createElement('div');
+                word.classList.add('random-text');
+                word.textContent = words[i < 3 ? 0 : 1];  // 前40条是 "ok"，接着50条是 "let it pass"
+                word.style.left = `${Math.random() * window.innerWidth}px`;
+                word.style.top = `${Math.random() * window.innerHeight}px`;
+                word.style.opacity = 0;
+                document.body.appendChild(word);
+
+                // 随机显示时间
+                setTimeout(() => {
+                    word.style.opacity = 1;  // 显示文字
+                }, Math.random() * 4000);  // 随机显示时间4s
+                setTimeout(() => {
+                    word.style.opacity = 0;  // 隐藏文字
+                }, 6000);  // 文字消失
+
+                word.addEventListener('mouseover', () => {
+                    word.classList.add('highlighted');
+                });
+
+                word.addEventListener('mouseout', () => {
+                    word.classList.remove('highlighted');
+                });
+
+                word.addEventListener('click', () => {
+                    window.location.href = 'option-soup.html';  // 点击跳转
+                });
+            }
+        }
+
+        createRandomText();  // 创建第一部分文字
+        createHiddenText();  // 创建第二部分文字
+    </script>
+</body>
+</html>
